@@ -14,9 +14,11 @@ class ViewController: UIViewController {
     var clLocationCordinateForPune : CLLocationCoordinate2D?
     var clLocationCoordinateForMumbai : CLLocationCoordinate2D?
     var clLocationCoordinateForNashik : CLLocationCoordinate2D?
+    var clLocationCoordinateForShaniwarWada : CLLocationCoordinate2D?
     var gmsPuneMarker : GMSMarker?
     var gmsMumbaiMarker : GMSMarker?
     var gmsNashikMarker : GMSMarker?
+    var gmsShaniwarWadaMarker : GMSMarker?
     
     var gmsCircle : GMSCircle?
     var gmsPolygon : GMSPolygon?
@@ -30,6 +32,8 @@ class ViewController: UIViewController {
         drawCircleOnMap()
         drawPolygonOnMap()
         drawPolylineOnMap()
+        
+        mapView?.delegate = self            //IMP
     }
     
     func initViews(){
@@ -38,7 +42,9 @@ class ViewController: UIViewController {
             longitude: 73.856255)
         
         let gmsCamera = GMSCameraPosition(target: CLLocationCoordinate2D(
-            latitude: 19.66, longitude: 75.13), zoom: 10.0)
+                                        latitude: 18.5190,
+                                        longitude: 73.85545),
+                                          zoom: 10.0)
         
         gmsPuneMarker = GMSMarker(position: clLocationCordinateForPune!)
         
@@ -63,6 +69,8 @@ class ViewController: UIViewController {
                        markerTitle: "Mumbai City",
                        markerSnippet: "City of Dreams!")
         
+        gmsMumbaiMarker?.map = mapView
+        
         clLocationCoordinateForNashik = CLLocationCoordinate2D(latitude: 19.9973,
                                                                longitude: 73.799)
         
@@ -70,6 +78,18 @@ class ViewController: UIViewController {
         markerSettings(marker: gmsNashikMarker!,
                        markerTitle: "Nashik City",
                        markerSnippet: "City of God!")
+        
+        gmsNashikMarker?.map = mapView
+        
+        clLocationCoordinateForShaniwarWada = CLLocationCoordinate2D(
+                                                latitude: 18.5190,
+                                                longitude: 73.85545)
+        gmsShaniwarWadaMarker = GMSMarker(position: clLocationCoordinateForShaniwarWada!)
+        markerSettings(marker: gmsShaniwarWadaMarker!,
+                       markerTitle: "Shaniwar Wada",
+                       markerSnippet: "Historical Place")
+        
+        gmsShaniwarWadaMarker?.map = mapView
     }
     
     func mapViewInitialSettings(){
@@ -142,6 +162,10 @@ extension ViewController : GMSMapViewDelegate{
         return false
     }
     
+    func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
+        print("did Tap of GMSOverlay has been called")
+    }
+    
     func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
         print("didTap At method has been called")
         print(coordinate.latitude," -- ",coordinate.longitude)
@@ -152,10 +176,31 @@ extension ViewController : GMSMapViewDelegate{
         print(marker.position)
     }
     
-//    func mapView(_ mapView: GMSMapView, markerInfoContents marker: GMSMarker) -> UIView? {
-////        print("markerInfoContents method has been called")
-//    }
-//   
+    func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
+        
+        let infoWindowRect = CGRect(x: 0, y: 0, width: 200, height: 100)
+        let infoWindow = UIView(frame: infoWindowRect)
+        
+        let cgRectForLabel1 = CGRect(x: 10, y: 10, width: 180, height: 35)
+        let label1 = UILabel(frame: cgRectForLabel1)
+        label1.text = "\(marker.title!)"
+        label1.font = UIFont(name: "Georgia-Bold", size: 14.0)
+        label1.textColor = .black
+        label1.backgroundColor = .clear
+        
+        let cgRectForLabel2 = CGRect(x: 10, y: 55, width: 180, height: 35)
+        let label2 = UILabel(frame: cgRectForLabel2)
+        label2.text = "\(marker.snippet!)"
+        label2.font = UIFont(name: "Copperplate-Bold", size: 12.0)
+        label2.textColor = .black
+        label2.backgroundColor = .clear
+        
+        infoWindow.addSubview(label1)
+        infoWindow.addSubview(label2)
+        
+        return infoWindow
+    }
+   
     func mapView(_ mapView: GMSMapView, didBeginDragging marker: GMSMarker) {
         print("didBeginDragging method has been called")
         print(marker.position)
@@ -170,6 +215,6 @@ extension ViewController : GMSMapViewDelegate{
         print("didEndDragging method has been called")
         print(marker.position)
     }
-    
+   
     
 }
